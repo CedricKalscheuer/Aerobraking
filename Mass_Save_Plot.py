@@ -5,12 +5,9 @@ from scipy.signal import argrelextrema
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import time as tm
 
-# TRY DECREASING R_DESCENT INSTEAD - CHECK WHY HIGHER APOAPSIS DOESNT RESULT IN LONGER TIME TO REACH ORBIT
-# RUN FULL SIMULATIONS PARALLEL FOR MULTIPLE R_P
-
 # === Begin user input  ============================
-m_0                 = 2500.0           # Initial spacecraft mass in [kg] TGO Initial mass 3755kg
-m_p                 = 2000.0           # Propellant mass in [kg] TGO dry mass 1750kg -> m_p = 2005kg
+m_0                 = 2500.0           # Initial spacecraft mass in [kg]
+m_p                 = 2000.0           # Propellant mass in [kg] TGO Aerobraking mass 1750kg
 thrust              = 424.0            # Thrust in [N] TGO Thrust 424N
 Isp                 = 326.0            # Specific impulse of TGO in [s] 326.0
 c_d                 = 2.2              # Drag coefficient
