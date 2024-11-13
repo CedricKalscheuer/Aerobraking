@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time as tm
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from matplotlib.lines import Line2D
 from matplotlib.ticker import ScalarFormatter 
 from matplotlib.widgets import CheckButtons, Slider
 from scipy.integrate import solve_ivp
@@ -10,7 +9,6 @@ from scipy.signal import argrelextrema
 
 #Ideas:
 #Plot for Time in atmosphere for Titan Flyby vs. b-plane-offset (b_i+200k: TiA=11.8-12.6min, 250k: TiA=12.2-13min, 300k: TiA=12.4-13.2min depending on r_p)
-#Plot for launch time window based on current Saturn to Titan constellation
 #Have thrust_duration set so that when crossing Titans Orbit on the way back to Saturn the S/C will aerobrake again to reduce the velocity
 
 #region User input
@@ -515,12 +513,9 @@ def simulate_trajectory(b, r_thrust_descend, r_thrust_ascend, r_p_slow, thrust_d
 #region Launch Time
 def calculate_launch_delay_iterative(initial_launch_time, b, r_p, radial_tolerance_km=500):
     global tolerance
-    # Get the initial spacecraft state using the helper function
-    x_0, y_0, r_0, phi_0, rho_r_0, rho_phi_0 = get_initial_spacecraft_state(b, v_inf, dist_saturn_titan, R_SOI_saturn)
 
     r_thrust_descend    = R_saturn + r_thrust_descending  # Total radius where thrust begins
     r_thrust_ascend     = R_saturn + r_thrust_ascending    # Total radius where thrust stops
-
     delay_time          = initial_launch_time  # Initialize delay time
     iteration           = 0  # Iteration counter
     max_iterations      =10
@@ -1464,15 +1459,18 @@ if __name__ == "__main__":
                 for config, color in color_map.items()
             ]
 
-            # Combining legends
-            plt.legend(handles=color_legend + [
+            # Add entries for max and average heating rates with specific markers
+            marker_legend = [
+                Line2D([0], [0], marker='x', color='black', lw=0, label='Max Heating Rate', markersize=6),
+                Line2D([0], [0], marker='o', color='black', lw=0, label='Average Heating Rate', markersize=6)
+            ]
+
+            # Combine legends for configurations, max/avg heating rates, and limits
+            plt.legend(handles=color_legend + marker_legend + [
                 Line2D([0], [0], color='black', linestyle='--', linewidth=1, label='Space Shuttle Radiation Limit'),
                 Line2D([0], [0], color='green', linestyle='-', linewidth=1, label='Ablative Limit (PICA)'),
                 Line2D([0], [0], color='orange', linestyle='-', linewidth=1, label='Heat Sink Limit (Aluminum)')
             ], loc='center left', bbox_to_anchor=(1, 0.5))
-
-            plt.grid(True, which='both', linestyle='--', linewidth=0.5)
-            plt.show()
 
         plot_heating_rate_vs_duration()
     #endregion
