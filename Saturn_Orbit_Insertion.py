@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time as tm
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from matplotlib.lines import Line2D
 from matplotlib.ticker import ScalarFormatter 
 from matplotlib.widgets import CheckButtons, Slider
 from scipy.integrate import solve_ivp
@@ -126,7 +127,8 @@ def handle_orbit_insertion_maneuver(r, m, mdry, t, r_thrust_descend, thrust_dura
     elif is_descending and r < r_thrust_descend and m > mdry:
         thrust_start_time = t
         thrust_active = True
-        #print(f"    Thrust start time set to t = {thrust_start_time/86400:.2f} days")
+        #print(f"r_thrust_descend = {r_thrust_descend:.0f} km")
+        #print(f"    Thrust start time set to t = {thrust_start_time/86400:.4f} days")
         return 1.0  # Throttle fully open
 
     else:
@@ -1453,7 +1455,6 @@ if __name__ == "__main__":
             plt.ylim(100, y_max)
 
             # Custom legend entries
-            from matplotlib.lines import Line2D
             color_legend = [
                 Line2D([0], [0], marker='o', color=color, lw=0, label=f'r_p = {config[1] - R_titan:.0f} km')
                 for config, color in color_map.items()
@@ -1471,6 +1472,7 @@ if __name__ == "__main__":
                 Line2D([0], [0], color='green', linestyle='-', linewidth=1, label='Ablative Limit (PICA)'),
                 Line2D([0], [0], color='orange', linestyle='-', linewidth=1, label='Heat Sink Limit (Aluminum)')
             ], loc='center left', bbox_to_anchor=(1, 0.5))
+            plt.grid(True, which='both', linestyle='--', linewidth=0.5)
 
         plot_heating_rate_vs_duration()
     #endregion
