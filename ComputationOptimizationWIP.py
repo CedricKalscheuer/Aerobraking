@@ -13,7 +13,7 @@ from scipy.signal import argrelextrema
 # === Rocket parameters ============================
 m_0                         = 3725.0            # Initial spacecraft mass in [kg]
 m_p                         = 2725.0            # Propellant mass in [kg]
-v_inf_values                = [1, 1.5, 2, 2.5]  # Hyperbolic excess speeds at infinity in [km/s]
+v_inf_values                = [1, 1.5, 2, 2.5, 3]  # Hyperbolic excess speeds at infinity in [km/s]
 thrust                      = 0                 # Thrust in [N]
 Isp                         = 3100              # Specific impulse
 c_d                         = 2.2               # Drag coefficient
@@ -29,10 +29,10 @@ r_a                         = 2000              # Apoapsis of desired orbit in [
 # === Output parameters ============================
 Plot_Trajectory             = True              # Plot spacecraft trajectory?
 Plot_Atmosphere             = False             # Plot atmospheric density over height?
-Plot_Values                 = False             # Plot panel of values?
+Plot_Values                 = True             # Plot panel of values?
 Optimize_Thrust_Duration    = False             # Optimize thrust duration?
-Plot_Comparison             = False             # Plot v_inf vs. r_p required?
-Plot_HeatingRate            = False             # Plot heating rate maximum and average over time?
+Plot_Comparison             = True             # Plot v_inf vs. r_p required?
+Plot_HeatingRate            = True             # Plot heating rate maximum and average over time?
 #endregion
 
 #region Prepare the program
@@ -559,7 +559,7 @@ def calculate_launch_delay_iterative(initial_launch_time, r_p, v_inf, radial_tol
             1.5: 9.144107110496 * 86400, 
             2.0: 2.150249524253 * 86400,
             2.5: 9.903401999419 * 86400,
-            3.0: 7.186058800871 * 86400,
+            3.0: 7.186058820768 * 86400,
         }
         delay_time = initial_delays.get(v_inf, 1.1740749647 * 86400)
     else:
@@ -666,7 +666,7 @@ def calculate_launch_delay_iterative(initial_launch_time, r_p, v_inf, radial_tol
                 elif abs(distance_error) >= 200:
                     delay_adjustment = abs(distance_error) * 0.17852 * (1/v_inf)**0.021 #( increase **0.02 to decrease the delay adjustment)
                 else:
-                    delay_adjustment = abs(distance_error) * 0.177 * (1/v_inf)**0.012
+                    delay_adjustment = abs(distance_error) * 0.1785 * (1/v_inf)**0.009
             else:
                 if abs(distance_error) >= 10000:
                     delay_adjustment = abs(distance_error) * 0.2222222
@@ -705,11 +705,11 @@ def adjust_r_p_to_match_crossing(v_inf, target_crossing_number, target_crossing_
 
     if target_crossing_number == 2:
         k_angle_base =  0.7 * (1/v_inf)**1.4
-        k_distance_base =  0.000064*(1/v_inf)**1.6
+        k_distance_base =  0.000064*(1/v_inf)**1.65
     elif target_crossing_number == 3:
         # For the third crossing, use smaller values for finer control
-        k_angle_base =  -0.0001*(1/v_inf)**0.6   
-        k_distance_base = -0.00000003*(1/v_inf)**1.3
+        k_angle_base =  -0.0001*(1/v_inf)**0.95   
+        k_distance_base = -0.000000025*(1/v_inf)**1.85
     else:
         # Default if other crossing numbers are used
         k_angle_base = 10 * (1 / v_inf)**0.7
@@ -807,11 +807,11 @@ def adjust_r_p_to_match_crossing(v_inf, target_crossing_number, target_crossing_
 def process_v_inf(v_inf_value):
 
     r_p_configurations = {
-        1.0: (R_titan + 1280.860562 , R_titan + 797.049108), #(R_titan + 784.263070 , R_titan + 1298.9902)
+        1.0: (R_titan + 1280.860562 , R_titan + 797.049108),
         1.5: (R_titan + 910.790733 , R_titan + 938.991489),
         2.0: (R_titan + 771.760234 , R_titan + 770.431014),
         2.5: (R_titan + 621.482754 , R_titan + 519.603648),
-        3.0: (R_titan + 554.061253 , R_titan + 1000.222381),      
+        3.0: (R_titan + 554.051757 , R_titan + 1633.360732),      
     }
 
     if v_inf_value in r_p_configurations:
@@ -995,7 +995,7 @@ if __name__ == "__main__":
 
             rp_values = sorted(trajectory_data.keys())
             # Include v_inf in the label
-            rp_labels = [f"v_inf={trajectory_data[rp][0]:.1f} km/s, r_p={rp - R_titan:.2f} km" for rp in rp_values]
+            rp_labels = [f"v_inf={trajectory_data[rp][0]:.1f} \nkm/s, r_p={rp - R_titan:.2f} km" for rp in rp_values]
 
             rp_checkbox_ax = plt.axes([0.01, 0.5, 0.15, 0.4], frameon=False)
             rp_checkbox = CheckButtons(rp_checkbox_ax, rp_labels, [False]*len(rp_labels))
